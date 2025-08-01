@@ -1,12 +1,18 @@
 {
-  "folders": [
-    {
-      "name": "client",
-      "path": "client"
-    },
-    {
-      "name": "server",
-      "path": "server"
-    }
-  ]
+	"folders": [
+		{
+			"name": "client",
+			"path": "client"
+		},
+		{
+			"name": "server",
+			"path": "server"
+		}
+	],
+	"settings": {
+		"editor.defaultFormatter": "csharpier.csharpier-vscode",
+		"[jsonc]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		}
+	}
 }
