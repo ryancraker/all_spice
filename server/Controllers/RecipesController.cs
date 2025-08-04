@@ -6,11 +6,17 @@ public class RecipesController : ControllerBase
 {
     private readonly RecipesService _recipesService;
     private readonly Auth0Provider _auth;
+    private readonly IngredientsService _ingredientsService;
 
-    public RecipesController(RecipesService recipesService, Auth0Provider auth)
+    public RecipesController(
+        RecipesService recipesService,
+        Auth0Provider auth,
+        IngredientsService ingredientsService
+    )
     {
         _recipesService = recipesService;
         _auth = auth;
+        _ingredientsService = ingredientsService;
     }
 
     [HttpPost, Authorize]
@@ -30,11 +36,19 @@ public class RecipesController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Recipe>> GetAllRecipes()
+    public ActionResult<List<Recipe>> GetAllRecipes([FromQuery] string category)
     {
         try
         {
-            List<Recipe> recipes = _recipesService.GetAllRecipes();
+            List<Recipe> recipes;
+            if (category == null)
+            {
+                recipes = _recipesService.GetAllRecipes();
+            }
+            else
+            {
+                recipes = _recipesService.GetAllRecipes(category);
+            }
             return Ok(recipes);
         }
         catch (Exception exception)
@@ -80,6 +94,20 @@ public class RecipesController : ControllerBase
             Account userInfo = await _auth.GetUserInfoAsync<Account>(HttpContext);
             string message = _recipesService.DeleteRecipe(recipeId, userInfo);
             return Ok(message);
+        }
+        catch (Exception exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
+    [HttpGet("{recipeId}/ingredients")]
+    public ActionResult<List<Ingredient>> GetIngredientsForRecipe(int recipeId)
+    {
+        try
+        {
+            List<Ingredient> ingredients = _ingredientsService.GetIngredientsForRecipe(recipeId);
+            return ingredients;
         }
         catch (Exception exception)
         {

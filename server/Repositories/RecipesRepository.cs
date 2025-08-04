@@ -32,7 +32,14 @@ public class RecipesRepository
 
     public List<Recipe> GetAllRecipes()
     {
-        string sql = "SELECT * FROM recipes JOIN accounts ON recipes.creator_id = accounts.id";
+        string sql =
+            @"SELECT recipes.*, 
+            COUNT(favorites.id) AS favoriteCount, accounts.*
+            FROM recipes 
+            JOIN accounts ON recipes.creator_id = accounts.id 
+            LEFT JOIN favorites ON recipes.id = favorites.recipe_id
+            GROUP BY recipes.id
+            ORDER BY recipes.id ASC";
         List<Recipe> recipes = _db.Query(
                 sql,
                 (Recipe recipe, Profile profile) =>
@@ -45,10 +52,34 @@ public class RecipesRepository
         return recipes;
     }
 
+    public List<Recipe> GetAllRecipes(string category)
+    {
+        string sql =
+            @"SELECT recipes.*, 
+            COUNT(favorites.id) AS favoriteCount, accounts.*
+            FROM recipes 
+            JOIN accounts ON recipes.creator_id = accounts.id 
+            LEFT JOIN favorites ON recipes.id = favorites.recipe_id
+            WHERE recipes.category = @category
+            GROUP BY recipes.id
+            ORDER BY recipes.id ASC;";
+        List<Recipe> recipes = _db.Query(
+                sql,
+                (Recipe recipe, Profile profile) =>
+                {
+                    recipe.Creator = profile;
+                    return recipe;
+                },
+                new { category }
+            )
+            .ToList();
+        return recipes;
+    }
+
     public Recipe GetRecipeById(int recipeId)
     {
         string sql =
-            "SELECT * FROM recipes JOIN accounts ON recipes.creator_id = accounts.id WHERE recipes.id = @recipeId;";
+            "SELECT recipes.*, COUNT(favorites.id) AS favoriteCount, accounts.* FROM recipes JOIN accounts ON recipes.creator_id = accounts.id LEFT JOIN favorites ON recipes.id = favorites.recipe_id WHERE recipes.id = @recipeId GROUP BY recipes.id;";
         Recipe recipe = _db.Query(
                 sql,
                 (Recipe recipe, Profile profile) =>
