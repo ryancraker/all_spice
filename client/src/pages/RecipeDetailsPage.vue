@@ -1,0 +1,143 @@
+<script setup>
+	import { AppState } from "@/AppState.js";
+	import Navbar from "@/components/Navbar.vue";
+	import { ingredientsService } from "@/services/IngredientsService.js";
+	import { recipesService } from "@/services/RecipesService.js";
+	import { logger } from "@/utils/Logger.js";
+	import { Pop } from "@/utils/Pop.js";
+	import { computed, onMounted } from "vue";
+	import { useRoute } from "vue-router";
+
+	onMounted(() => {
+		getIngredientsByRecipeId();
+		getRecipeById();
+	});
+
+	const route = useRoute();
+	const recipe = computed(() => AppState.selectedRecipe);
+	const ingredients = computed(() => AppState.ingredients);
+	const account = computed(() => AppState.account);
+	const editMode = false;
+
+	async function getRecipeById() {
+		try {
+			await recipesService.getRecipeById(route.params.recipeId);
+		} catch (error) {
+			Pop.error(error);
+			logger.error(error, "could not get recipe");
+		}
+	}
+
+	async function getIngredientsByRecipeId() {
+		try {
+			await ingredientsService.getIngredientsByRecipeId(route.params.recipeId);
+		} catch (error) {
+			Pop.error(error);
+			logger.error(error, "could not get ingredients");
+		}
+	}
+	async function deleteRecipe() {
+		const confirm = await Pop.confirm("Are you sure you want to remove your recipe?");
+		if (!confirm) return;
+		try {
+			await recipesService.deleteRecipe(route.params.recipeId);
+			window.location.replace("/");
+		} catch (error) {
+			Pop.error(error);
+			logger.error(error);
+		}
+	}
+</script>
+
+<template>
+	<header>
+		<Navbar />
+	</header>
+	<section v-if="recipe" class="container-fluid">
+		<div v-if="!editMode" class="row">
+			<div class="col-12">
+				<div class="row">
+					<div class="col-4 background-img position-relative">
+						<span class="fav-count"><i class="mdi mdi-heart"></i> {{ recipe.favoriteCount }}</span>
+						<img class="recipe-img" :src="recipe.imgUrl" :alt="recipe.title" />
+					</div>
+					<div class="col-8">
+						<div class="row">
+							<div class="col-12 text-left mt-2">
+								<div class="d-flex align-items-center gap-2">
+									<span class="fs-1">{{ recipe.title }}</span>
+									<button
+										v-if="recipe.creatorId == account?.id"
+										class="btn btn-secondary fs-5"
+										type="button"
+										data-bs-toggle="collapse"
+										data-bs-target="#creator-options"
+										aria-expanded="false"
+										aria-controls="creator-options">
+										...
+									</button>
+									<button v-else><i class="mdi mdi-heart-outline"></i></button>
+									<div class="collapse collapse-horizontal" id="creator-options">
+										<div class="card card-body" style="width: 300px">
+											<button type="button" class="btn btn-danger" @click="deleteRecipe()">
+												Delete Recipe
+											</button>
+											<button>Edit Recipe</button>
+										</div>
+									</div>
+								</div>
+								<p>by: {{ recipe.creator.name }}</p>
+								<span class="recipe-category text-capitalize">{{ recipe.category }}</span>
+							</div>
+							<div class="col-12">
+								<div class="my-5">
+									<h2>Ingredients</h2>
+									<span v-for="ingredient in ingredients" :key="ingredient.id">
+										{{ ingredient.quantity }} {{ ingredient.name }}
+									</span>
+								</div>
+								<h3>Instructions</h3>
+								<span>{{ recipe.instructions }}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-if="editMode" class="row"></div>
+	</section>
+	<section v-else>
+		<h1>Loading your recipe...<i class="mdi mdi-loading mdi-spin"></i></h1>
+	</section>
+</template>
+
+<style lang="scss" scoped>
+	.fav-count {
+		position: absolute;
+		top: 0;
+		left: 10%;
+		font-size: 2rem;
+		backdrop-filter: blur(5px);
+		background-color: rgba(110, 110, 110, 0.18);
+		border-bottom-left-radius: 10px;
+		border-bottom-right-radius: 10px;
+		padding: 0.25rem;
+		color: var(--bs-success);
+		font-weight: bold;
+		text-shadow: 1px 1px 3px black;
+	}
+	.recipe-img {
+		height: 100dvh;
+		width: 100%;
+		object-fit: cover;
+	}
+	.recipe-category {
+		background-color: rgba(128, 128, 128, 0.56);
+		backdrop-filter: blur(5px);
+		color: white;
+		padding: 0.5rem;
+		border-radius: 20px;
+		text-shadow: 2px 3px 5px black;
+		font-weight: bold;
+	}
+</style>

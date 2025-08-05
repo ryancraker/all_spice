@@ -112,3 +112,16 @@ FROM
 GROUP BY
     favorites.recipe_id
 ORDER BY recipes.id ASC
+
+SELECT
+    recipes.*,
+    COUNT(favorites.id) AS favoriteCount,
+    favorites.id AS favoriteId,
+    favorites.account_id AS accountId,
+    accounts.*
+FROM
+    favorites
+    RIGHT JOIN recipes ON favorites.recipe_id = recipes.id
+    JOIN accounts ON recipes.creator_id = accounts.id
+GROUP BY
+    recipes.id

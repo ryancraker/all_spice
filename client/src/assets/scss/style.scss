@@ -18,3 +18,12 @@ main {
   justify-content: start;
   align-items: end;
 }
+
+.search-button {
+		background-color: rgba(255, 255, 255, 0);
+		padding: 0.25rem;
+		border: none;
+		position: absolute;
+		top: -7px;
+		right: 0;
+	}
