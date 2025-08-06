@@ -10,11 +10,13 @@ const routes = [
 		path: "/",
 		name: "Home",
 		component: loadPage("HomePage")
+		// beforeEnter: authSettled
 	},
 	{
 		path: "/recipes/:recipeId",
 		name: "Recipe Details",
 		component: loadPage("RecipeDetailsPage")
+		// beforeEnter: authSettled
 	},
 	{
 		path: "/account",

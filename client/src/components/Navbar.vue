@@ -20,7 +20,7 @@
 </script>
 
 <template>
-	<nav class="navbar navbar-expand-md bg-gray border-bottom border-vue">
+	<nav class="navbar navbar-expand-md bg-gray">
 		<div class="container-fluid gap-2 mx-3">
 			<RouterLink :to="{ name: 'Home' }" class="d-flex align-items-center text-light">
 				<img class="navbar-brand" alt="logo" src="../assets/img/shaker.png" height="45" />
@@ -66,7 +66,6 @@
 	}
 
 	.navbar-nav .router-link-exact-active {
-		border-bottom: 2px solid var(--bs-success);
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 	}
@@ -74,5 +73,6 @@
 	.navbar {
 		position: sticky;
 		top: 0;
+		border-bottom: solid thin;
 	}
 </style>

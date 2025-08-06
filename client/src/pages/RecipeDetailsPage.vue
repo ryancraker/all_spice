@@ -5,7 +5,7 @@
 	import { recipesService } from "@/services/RecipesService.js";
 	import { logger } from "@/utils/Logger.js";
 	import { Pop } from "@/utils/Pop.js";
-	import { computed, onMounted } from "vue";
+	import { computed, onMounted, ref } from "vue";
 	import { useRoute } from "vue-router";
 
 	onMounted(() => {
@@ -17,16 +17,23 @@
 	const recipe = computed(() => AppState.selectedRecipe);
 	const ingredients = computed(() => AppState.ingredients);
 	const account = computed(() => AppState.account);
-	const editMode = false;
+	const editMode = ref(false);
 
 	async function getRecipeById() {
 		try {
 			await recipesService.getRecipeById(route.params.recipeId);
+			recipeData.value.instructions = recipe.value.instructions;
+			recipeData.value.title = recipe.value.title;
 		} catch (error) {
 			Pop.error(error);
 			logger.error(error, "could not get recipe");
 		}
 	}
+
+	const recipeData = ref({
+		title: recipe.value?.title,
+		instructions: recipe.value?.instructions
+	});
 
 	async function getIngredientsByRecipeId() {
 		try {
@@ -47,13 +54,22 @@
 			logger.error(error);
 		}
 	}
+	async function updateRecipe() {
+		try {
+			logger.log(recipeData.value);
+			editMode.value = false;
+		} catch (error) {
+			Pop.error(error);
+			logger.error(error);
+		}
+	}
 </script>
 
 <template>
 	<header>
 		<Navbar />
 	</header>
-	<section v-if="recipe" class="container-fluid">
+	<section v-if="recipe" class="container-fluid ps-0">
 		<div v-if="!editMode" class="row">
 			<div class="col-12">
 				<div class="row">
@@ -80,10 +96,17 @@
 									<button v-else><i class="mdi mdi-heart-outline"></i></button>
 									<div class="collapse collapse-horizontal" id="creator-options">
 										<div class="card card-body d-flex gap-2">
+											<button
+												type="button"
+												class="btn btn-secondary"
+												@click="editMode = true"
+												data-bs-target="#creator-options"
+												data-bs-toggle="collapse">
+												Edit Recipe
+											</button>
 											<button type="button" class="btn btn-danger" @click="deleteRecipe()">
 												Delete Recipe
 											</button>
-											<button type="button" class="btn btn-secondary">Edit Recipe</button>
 										</div>
 									</div>
 								</div>
@@ -105,7 +128,57 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="editMode" class="row"></div>
+		<div v-if="editMode" class="row">
+			<div class="col-12">
+				<div class="row">
+					<div class="col-4 background-img position-relative">
+						<span class="fav-count"><i class="mdi mdi-heart"></i> {{ recipe.favoriteCount }}</span>
+						<img class="recipe-img" :src="recipe.imgUrl" :alt="recipe.title" />
+					</div>
+					<div class="col-8">
+						<div class="row">
+							<form @submit.prevent="updateRecipe()">
+								<div class="col-12 text-left mt-2">
+									<div class="d-flex align-items-center gap-4">
+										<span class="fs-1">{{ recipe.title }}</span>
+										<button
+											type="button"
+											@click="
+												(editMode = false),
+													(recipeData.instructions = recipe.instructions),
+													(recipeData.title = recipe.title)
+											">
+											Cancel
+										</button>
+										<button type="submit">Update Recipe</button>
+									</div>
+									<p>by: {{ recipe.creator.name }}</p>
+									<span class="recipe-category text-capitalize">{{ recipe.category }}</span>
+								</div>
+								<div class="col-12">
+									<div class="my-5">
+										<h2>Ingredients</h2>
+										<span v-for="ingredient in ingredients" :key="ingredient.id">
+											{{ ingredient.quantity }} {{ ingredient.name }}
+										</span>
+									</div>
+									<h3>Instructions</h3>
+									<label
+										for="instructions"
+										title="Recipe Instructions"
+										aria-label="Instructions"></label>
+									<textarea
+										v-model="recipeData.instructions"
+										name="instructions"
+										id="instructions"
+										:placeholder="recipe.instructions"></textarea>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</section>
 	<section v-else>
 		<h1>Loading your recipe...<i class="mdi mdi-loading mdi-spin"></i></h1>
@@ -113,6 +186,15 @@
 </template>
 
 <style lang="scss" scoped>
+	header {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+	textarea {
+		resize: none;
+		width: 100%;
+	}
 	.card-body {
 		width: 200px;
 	}
