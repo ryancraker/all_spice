@@ -21,7 +21,7 @@
 
 <template>
 	<nav class="navbar navbar-expand-md bg-gray border-bottom border-vue">
-		<div class="container gap-2">
+		<div class="container-fluid gap-2 mx-3">
 			<RouterLink :to="{ name: 'Home' }" class="d-flex align-items-center text-light">
 				<img class="navbar-brand" alt="logo" src="../assets/img/shaker.png" height="45" />
 				<b class="fs-5">All Spice</b>
@@ -39,13 +39,6 @@
 			</button>
 			<!-- collapsing menu -->
 			<div class="collapse navbar-collapse" id="navbar-links">
-				<ul class="navbar-nav">
-					<li>
-						<RouterLink :to="{ name: 'About' }" class="btn text-green selectable">
-							About
-						</RouterLink>
-					</li>
-				</ul>
 				<!-- LOGIN COMPONENT HERE -->
 				<div class="ms-auto bg-gray d-flex align-items-center gap-3">
 					<form>

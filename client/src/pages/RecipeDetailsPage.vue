@@ -64,25 +64,26 @@
 					<div class="col-8">
 						<div class="row">
 							<div class="col-12 text-left mt-2">
-								<div class="d-flex align-items-center gap-2">
+								<div class="d-flex align-items-center gap-4">
 									<span class="fs-1">{{ recipe.title }}</span>
 									<button
 										v-if="recipe.creatorId == account?.id"
-										class="btn btn-secondary fs-5"
+										class="btn btn-secondary fs-5 p-1 py-0"
 										type="button"
 										data-bs-toggle="collapse"
 										data-bs-target="#creator-options"
 										aria-expanded="false"
-										aria-controls="creator-options">
-										...
+										aria-controls="creator-options"
+										title="Recipe Creator Options">
+										<i class="mdi mdi-dots-horizontal"></i>
 									</button>
 									<button v-else><i class="mdi mdi-heart-outline"></i></button>
 									<div class="collapse collapse-horizontal" id="creator-options">
-										<div class="card card-body" style="width: 300px">
+										<div class="card card-body d-flex gap-2">
 											<button type="button" class="btn btn-danger" @click="deleteRecipe()">
 												Delete Recipe
 											</button>
-											<button>Edit Recipe</button>
+											<button type="button" class="btn btn-secondary">Edit Recipe</button>
 										</div>
 									</div>
 								</div>
@@ -112,6 +113,9 @@
 </template>
 
 <style lang="scss" scoped>
+	.card-body {
+		width: 200px;
+	}
 	.fav-count {
 		position: absolute;
 		top: 0;
