@@ -45,7 +45,7 @@ public class FavoritesRepository
                 accounts.*
                 FROM
                 favorites
-                RIGHT JOIN recipes ON favorites.recipe_id = recipes.id
+                RIGHT JOIN recipes_with_fav_count AS recipes ON favorites.recipe_id = recipes.id
                 JOIN accounts ON recipes.creator_id = accounts.id
                 WHERE favorites.account_id = @userId;
             ";

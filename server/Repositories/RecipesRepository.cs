@@ -33,11 +33,9 @@ public class RecipesRepository
     public List<Recipe> GetAllRecipes()
     {
         string sql =
-            @"SELECT recipes.*, 
-            COUNT(favorites.id) AS favoriteCount, accounts.*
-            FROM recipes 
+            @"SELECT recipes.*, accounts.*
+            FROM recipes_with_fav_count AS recipes 
             JOIN accounts ON recipes.creator_id = accounts.id 
-            LEFT JOIN favorites ON recipes.id = favorites.recipe_id
             GROUP BY recipes.id
             ORDER BY recipes.id ASC";
         List<Recipe> recipes = _db.Query(
@@ -55,9 +53,8 @@ public class RecipesRepository
     public List<Recipe> GetAllRecipes(string category)
     {
         string sql =
-            @"SELECT recipes.*, 
-            COUNT(favorites.id) AS favoriteCount, accounts.*
-            FROM recipes 
+            @"SELECT recipes.*, accounts.*
+            FROM recipes_with_fav_count AS recipes
             JOIN accounts ON recipes.creator_id = accounts.id 
             LEFT JOIN favorites ON recipes.id = favorites.recipe_id
             WHERE recipes.category = @category
@@ -79,7 +76,12 @@ public class RecipesRepository
     public Recipe GetRecipeById(int recipeId)
     {
         string sql =
-            "SELECT recipes.*, COUNT(favorites.id) AS favoriteCount, accounts.* FROM recipes JOIN accounts ON recipes.creator_id = accounts.id LEFT JOIN favorites ON recipes.id = favorites.recipe_id WHERE recipes.id = @recipeId GROUP BY recipes.id;";
+            @"SELECT recipes.*, accounts.* 
+            FROM recipes_with_fav_count AS recipes 
+            JOIN accounts ON recipes.creator_id = accounts.id 
+            LEFT JOIN favorites ON recipes.id = favorites.recipe_id 
+            WHERE recipes.id = @recipeId 
+            GROUP BY recipes.id;";
         Recipe recipe = _db.Query(
                 sql,
                 (Recipe recipe, Profile profile) =>

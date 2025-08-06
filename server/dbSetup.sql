@@ -125,3 +125,20 @@ FROM
     JOIN accounts ON recipes.creator_id = accounts.id
 GROUP BY
     recipes.id
+
+CREATE VIEW recipes_with_fav_count AS
+SELECT recipes.*, COUNT(favorites.recipe_id) AS favoriteCount
+FROM recipes
+    LEFT JOIN favorites ON recipes.id = favorites.recipe_id
+GROUP BY
+    recipes.id
+ORDER BY recipes.id;
+
+SELECT recipes.*, accounts.*
+FROM
+    recipes_with_fav_count AS recipes
+    JOIN accounts ON recipes.creator_id = accounts.id
+    LEFT JOIN favorites ON recipes.id = favorites.recipe_id
+GROUP BY
+    recipes.id
+ORDER BY recipes.id ASC;

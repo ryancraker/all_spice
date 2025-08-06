@@ -51,11 +51,9 @@
 			</button>
 		</div>
 		<RouterLink :to="{ name: 'Recipe Details', params: { recipeId: recipe.recipe.id } }">
-			<div class="recipe-title d-flex justify-content-between fs-4">
+			<div class="recipe-title d-flex justify-content-between flex-column fs-4">
 				<span>{{ recipe.recipe.title }}</span>
-				<span class="display-block">
-					{{ recipe.recipe.favoriteCount }} <i class="mdi mdi-heart"></i>
-				</span>
+				<span class=""> {{ recipe.recipe.favoriteCount }} <i class="mdi mdi-heart"></i> </span>
 			</div>
 		</RouterLink>
 	</div>
@@ -115,5 +113,6 @@
 		background-color: rgba(128, 128, 128, 0.56);
 		backdrop-filter: blur(5px);
 		border: none;
+		font-size: 2rem;
 	}
 </style>

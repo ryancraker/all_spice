@@ -1,6 +1,7 @@
 <script setup>
 	import { AppState } from "@/AppState.js";
 	import Login from "@/components/Login.vue";
+	import NewRecipeModal from "@/components/NewRecipeModal.vue";
 	import RecipeCard from "@/components/RecipeCard.vue";
 	import { accountService } from "@/services/AccountService.js";
 	import { recipesService } from "@/services/RecipesService.js";
@@ -81,16 +82,54 @@
 					<RecipeCard :recipe />
 				</div>
 			</div>
+			<!-- ANCHOR add button -->
+			<div class="add-button text-end fs-3">
+				<button
+					v-if="account"
+					type="button"
+					title="Add a recipe"
+					data-bs-toggle="modal"
+					data-bs-target="#recipe-modal"
+					aria-label="Add a recipe"
+					aria-labelledby="Add a recipe">
+					<i class="mdi mdi-plus"></i>
+				</button>
+			</div>
 		</div>
 		<div v-else class="row mt-5">
 			<p class="fs-1 text-center">Loading Recipes...<i class="mdi mdi-loading mdi-spin"></i></p>
 		</div>
+		<NewRecipeModal class="recipe-modal" />
 	</section>
 </template>
 
 <style scoped lang="scss">
 	a {
 		text-decoration: none;
+	}
+
+	.recipe-modal {
+		z-index: 9999;
+	}
+
+	.add-button {
+		position: sticky;
+		bottom: 5%;
+		z-index: 9999;
+		& button {
+			margin-right: 1rem;
+			border-radius: 50%;
+			height: 2rem;
+			aspect-ratio: 1/1;
+			height: 3rem;
+			color: white;
+			background-color: green;
+			border: thin inset;
+			&:active {
+				transform: scale(0.95);
+				filter: brightness(0.9);
+			}
+		}
 	}
 	.hero-button {
 		background-color: white;
