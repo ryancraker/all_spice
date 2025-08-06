@@ -41,7 +41,7 @@
 		if (!confirm) return;
 		try {
 			await recipesService.deleteRecipe(route.params.recipeId);
-			window.location.replace("/");
+			location.replace("/");
 		} catch (error) {
 			Pop.error(error);
 			logger.error(error);
