@@ -12,13 +12,23 @@
 		getIngredientsByRecipeId();
 		getRecipeById();
 	});
-
+	// SECTION variables
 	const route = useRoute();
 	const recipe = computed(() => AppState.selectedRecipe);
 	const ingredients = computed(() => AppState.ingredients);
 	const account = computed(() => AppState.account);
 	const editMode = ref(false);
-
+	const newIngredient = ref({
+		name: "",
+		quantity: "",
+		recipeId: route.params.recipeId
+	});
+	const recipeData = ref({
+		title: recipe.value?.title,
+		instructions: recipe.value?.instructions
+	});
+	// !SECTION
+	// SECTION functions
 	async function getRecipeById() {
 		try {
 			await recipesService.getRecipeById(route.params.recipeId);
@@ -30,11 +40,6 @@
 		}
 	}
 
-	const recipeData = ref({
-		title: recipe.value?.title,
-		instructions: recipe.value?.instructions
-	});
-
 	async function getIngredientsByRecipeId() {
 		try {
 			await ingredientsService.getIngredientsByRecipeId(route.params.recipeId);
@@ -43,6 +48,7 @@
 			logger.error(error, "could not get ingredients");
 		}
 	}
+
 	async function deleteRecipe() {
 		const confirm = await Pop.confirm("Are you sure you want to remove your recipe?");
 		if (!confirm) return;
@@ -54,15 +60,41 @@
 			logger.error(error);
 		}
 	}
+
 	async function updateRecipe() {
 		try {
-			logger.log(recipeData.value);
+			const updatedRecipe = recipeData.value;
+			const recipeId = route.params.recipeId;
+			await recipesService.updateRecipe(updatedRecipe, recipeId);
 			editMode.value = false;
 		} catch (error) {
 			Pop.error(error);
 			logger.error(error);
 		}
 	}
+
+	async function addIngredient() {
+		try {
+			const ingredient = newIngredient.value;
+			await ingredientsService.addIngredient(ingredient);
+			newIngredient.value.name = "";
+			newIngredient.value.quantity = "";
+		} catch (error) {
+			Pop.error(error);
+			logger.error(error);
+		}
+	}
+
+	async function deleteIngredient(ingredientId) {
+		try {
+			logger.log(ingredientId);
+			await ingredientsService.deleteIngredient(ingredientId);
+		} catch (error) {
+			Pop.error(error);
+			logger.error(error);
+		}
+	}
+	// !SECTION
 </script>
 
 <template>
@@ -140,7 +172,14 @@
 							<form @submit.prevent="updateRecipe()">
 								<div class="col-12 text-left mt-2">
 									<div class="d-flex align-items-center gap-4">
-										<span class="fs-1">{{ recipe.title }}</span>
+										<label for="recipe-title"></label>
+										<input
+											v-model="recipeData.title"
+											type="text"
+											id="recipe-title"
+											maxlength="255"
+											:placeholder="recipe.title"
+											required />
 										<button
 											type="button"
 											@click="
@@ -159,8 +198,37 @@
 									<div class="my-5">
 										<h2>Ingredients</h2>
 										<span v-for="ingredient in ingredients" :key="ingredient.id">
-											{{ ingredient.quantity }} {{ ingredient.name }}
+											<button
+												@click="deleteIngredient(ingredient.id)"
+												class="mdi mdi-delete"
+												title="Remove Ingredient"></button
+											>{{ ingredient.quantity }} {{ ingredient.name }}
 										</span>
+									</div>
+									<div class="row">
+										<form @submit.prevent="addIngredient()">
+											<div class="col-6">
+												<label for="ingredient-quantity"></label>
+												<input
+													v-model="newIngredient.quantity"
+													type="text"
+													id="ingredient-quantity"
+													maxlength="255"
+													required />
+											</div>
+											<div class="col-6">
+												<label for="ingredient-name"></label>
+												<input
+													v-model="newIngredient.name"
+													type="text"
+													id="ingredient-name"
+													maxlength="255"
+													required />
+											</div>
+											<button class="btn" type="submit" title="Add Ingredient">
+												<i class="mdi mdi-plus-circle"></i>
+											</button>
+										</form>
 									</div>
 									<h3>Instructions</h3>
 									<label

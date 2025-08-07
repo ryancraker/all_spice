@@ -4,6 +4,11 @@ import { AppState } from "@/AppState.js";
 import { Recipe } from "@/models/Recipe.js";
 
 class RecipesService {
+	async updateRecipe(updatedRecipe, recipeId) {
+		const res = await api.put(`api/recipes/${recipeId}`, updatedRecipe);
+		logger.log(res.data);
+		AppState.selectedRecipe = new Recipe(res.data);
+	}
 	async submitRecipe(recipeData) {
 		const res = await api.post("api/recipes", recipeData);
 		logger.log(res.data);

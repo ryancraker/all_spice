@@ -12,6 +12,7 @@
 
 	const account = computed(() => AppState.account);
 	watch(account, getMyFavorites);
+
 	const recipes = computed(() => {
 		if (selectedRecipes.value == "my recipes") {
 			return AppState.recipes.filter(recipe => recipe.creatorId == account.value?.id);
@@ -49,13 +50,15 @@
 		<div class="row position-relative mb-5">
 			<div class="col-12">
 				<div class="login-search d-flex align-items-center gap-2">
-					<form>
-						<div class="d-flex position-relative align-items-center">
-							<label for="search-bar"></label>
-							<input id="search-bar" type="text" placeholder="Search" />
-							<button class="search-button"><i class="fs-4 mdi mdi-magnify"></i></button>
-						</div>
-					</form>
+					<label for="recipe-category" class="mb-2">Category</label>
+					<select class="form-select" aria-label="Category Select" id="recipe-category" required>
+						<option disabled selected>Select a Category</option>
+						<option value="">All</option>
+						<option value="breakfast">Breakfast</option>
+						<option value="lunch">Lunch</option>
+						<option value="dinner">Dinner</option>
+						<option value="snack">Snack</option>
+					</select>
 					<Login />
 				</div>
 				<div class="hero-section text-center text-light d-flex flex-column justify-content-center">

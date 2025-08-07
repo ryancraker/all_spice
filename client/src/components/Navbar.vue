@@ -41,13 +41,6 @@
 			<div class="collapse navbar-collapse" id="navbar-links">
 				<!-- LOGIN COMPONENT HERE -->
 				<div class="ms-auto bg-gray d-flex align-items-center gap-3">
-					<form>
-						<div class="d-flex position-relative align-items-center">
-							<label for="search-bar"></label>
-							<input id="search-bar" type="text" placeholder="Search" />
-							<button class="search-button"><i class="fs-4 mdi mdi-magnify"></i></button>
-						</div>
-					</form>
 					<Login />
 				</div>
 			</div>
