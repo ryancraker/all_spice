@@ -14,14 +14,30 @@
 	watch(account, getMyFavorites);
 
 	const recipes = computed(() => {
-		if (selectedRecipes.value == "my recipes") {
-			return AppState.recipes.filter(recipe => recipe.creatorId == account.value?.id);
+		if (selectedCategory.value == "") {
+			if (selectedRecipes.value == "my recipes") {
+				return AppState.recipes.filter(recipe => recipe.creatorId == account.value?.id);
+			}
+			if (selectedRecipes.value == "favorites") {
+				return AppState.favoriteRecipes;
+			}
+			return AppState.recipes;
 		}
-		if (selectedRecipes.value == "favorites") {
-			return AppState.favoriteRecipes;
+		if (selectedCategory.value != "") {
+			if (selectedRecipes.value == "my recipes") {
+				return AppState.recipes.filter(
+					recipe =>
+						recipe.creatorId == account.value?.id && recipe.category == selectedCategory.value
+				);
+			}
+			if (selectedRecipes.value == "favorites") {
+				return AppState.favoriteRecipes.filter(recipe => recipe.category == selectedCategory.value);
+			}
+			return AppState.recipes.filter(recipe => recipe.category == selectedCategory.value);
 		}
 		return AppState.recipes;
 	});
+	const selectedCategory = ref("");
 	const selectedRecipes = ref("home");
 
 	async function getAllRecipes() {
@@ -50,15 +66,22 @@
 		<div class="row position-relative mb-5">
 			<div class="col-12">
 				<div class="login-search d-flex align-items-center gap-2">
-					<label for="recipe-category" class="mb-2">Category</label>
-					<select class="form-select" aria-label="Category Select" id="recipe-category" required>
-						<option disabled selected>Select a Category</option>
-						<option value="">All</option>
-						<option value="breakfast">Breakfast</option>
-						<option value="lunch">Lunch</option>
-						<option value="dinner">Dinner</option>
-						<option value="snack">Snack</option>
-					</select>
+					<div class="d-flex">
+						<label for="recipe-category"></label>
+						<select
+							v-model="selectedCategory"
+							class="form-select"
+							aria-label="Category Select"
+							id="recipe-category"
+							required>
+							<option disabled selected>Select a Category</option>
+							<option value="">All</option>
+							<option value="breakfast">Breakfast</option>
+							<option value="lunch">Lunch</option>
+							<option value="dinner">Dinner</option>
+							<option value="snack">Snack</option>
+						</select>
+					</div>
 					<Login />
 				</div>
 				<div class="hero-section text-center text-light d-flex flex-column justify-content-center">
@@ -69,11 +92,24 @@
 			</div>
 			<div class="col-12 d-flex justify-content-center">
 				<div class="hero-buttons">
-					<button @click="selectedRecipes = 'home'" class="hero-button">Home</button>
-					<button @click="selectedRecipes = 'my recipes'" v-if="account" class="hero-button">
+					<button
+						@click="selectedRecipes = 'home'"
+						class="hero-button"
+						:class="{ selectedbutton: selectedRecipes == 'home' }">
+						Home
+					</button>
+					<button
+						@click="selectedRecipes = 'my recipes'"
+						v-if="account"
+						class="hero-button"
+						:class="{ selectedbutton: selectedRecipes == 'my recipes' }">
 						My Recipes
 					</button>
-					<button @click="selectedRecipes = 'favorites'" v-if="account" class="hero-button">
+					<button
+						@click="selectedRecipes = 'favorites'"
+						v-if="account"
+						class="hero-button"
+						:class="{ selectedbutton: selectedRecipes == 'favorites' }">
 						Favorites
 					</button>
 				</div>
@@ -160,7 +196,11 @@
 		border-radius: 5px;
 		background-color: white;
 	}
-
+	.selectedbutton {
+		background-color: green;
+		color: white;
+		font-weight: bold;
+	}
 	.hero-section {
 		background-image: url(../assets/img/HomeBg.jpg);
 		width: 100%;

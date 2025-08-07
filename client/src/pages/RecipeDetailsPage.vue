@@ -76,6 +76,9 @@
 	async function addIngredient() {
 		try {
 			const ingredient = newIngredient.value;
+			if (ingredient.name == "" || ingredient.quantity == "") {
+				throw new Error("Both the quantiy and the name must be included to add an ingredient");
+			}
 			await ingredientsService.addIngredient(ingredient);
 			newIngredient.value.name = "";
 			newIngredient.value.quantity = "";
@@ -148,9 +151,9 @@
 							<div class="col-12">
 								<div class="my-5">
 									<h2>Ingredients</h2>
-									<span v-for="ingredient in ingredients" :key="ingredient.id">
+									<p v-for="ingredient in ingredients" :key="ingredient.id">
 										{{ ingredient.quantity }} {{ ingredient.name }}
-									</span>
+									</p>
 								</div>
 								<h3>Instructions</h3>
 								<span>{{ recipe.instructions }}</span>
@@ -197,39 +200,44 @@
 								<div class="col-12">
 									<div class="my-5">
 										<h2>Ingredients</h2>
-										<span v-for="ingredient in ingredients" :key="ingredient.id">
+										<p v-for="ingredient in ingredients" :key="ingredient.id">
 											<button
 												@click="deleteIngredient(ingredient.id)"
+												type="button"
 												class="mdi mdi-delete"
 												title="Remove Ingredient"></button
 											>{{ ingredient.quantity }} {{ ingredient.name }}
-										</span>
+										</p>
 									</div>
-									<div class="row">
-										<form @submit.prevent="addIngredient()">
-											<div class="col-6">
-												<label for="ingredient-quantity"></label>
-												<input
-													v-model="newIngredient.quantity"
-													type="text"
-													id="ingredient-quantity"
-													maxlength="255"
-													required />
-											</div>
-											<div class="col-6">
-												<label for="ingredient-name"></label>
-												<input
-													v-model="newIngredient.name"
-													type="text"
-													id="ingredient-name"
-													maxlength="255"
-													required />
-											</div>
-											<button class="btn" type="submit" title="Add Ingredient">
+									<form class="row d-flex justify-content-start">
+										<div class="col-lg-2">
+											<button
+												class="btn"
+												type="button"
+												@click="addIngredient()"
+												title="Add Ingredient">
 												<i class="mdi mdi-plus-circle"></i>
 											</button>
-										</form>
-									</div>
+										</div>
+										<div class="col-lg-5 d-flex align-items-center gap-1">
+											<label for="ingredient-quantity">Quantity:</label>
+											<input
+												v-model="newIngredient.quantity"
+												type="text"
+												id="ingredient-quantity"
+												maxlength="255"
+												required />
+										</div>
+										<div class="col-lg-5 d-flex align-items-center gap-1">
+											<label for="ingredient-name">Ingredient:</label>
+											<input
+												v-model="newIngredient.name"
+												type="text"
+												id="ingredient-name"
+												maxlength="255"
+												required />
+										</div>
+									</form>
 									<h3>Instructions</h3>
 									<label
 										for="instructions"
@@ -257,8 +265,9 @@
 	header {
 		position: sticky;
 		top: 0;
-		z-index: 2;
+		z-index: 1;
 	}
+
 	textarea {
 		resize: none;
 		width: 100%;
